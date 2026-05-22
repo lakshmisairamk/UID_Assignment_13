@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IMDb: Ratings, Reviews, and Where to Watch the Best Movies & TV Shows</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#F5C518;--gold-dark:#d4a017;
+  --bg:#121212;--bg2:#1a1a1a;--bg3:#242424;--bg4:#2c2c2c;
+  --text:#ffffff;--text2:#a8a8a8;--text3:#6b6b6b;
+  --blue:#5799ef;--green:#3ab757;--border:#2a2a2a;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Roboto',Arial,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.4}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;font-family:inherit;border:none;outline:none}
+ul{list-style:none}
+img{display:block;max-width:100%}
+
+/* ── TOPBAR ── */
+.topbar{background:#000;height:56px;display:flex;align-items:center;padding:0 20px;gap:12px;position:sticky;top:0;z-index:1000;border-bottom:1px solid #1a1a1a}
+.logo{background:var(--gold);color:#000;font-weight:900;font-size:22px;padding:3px 7px;border-radius:4px;letter-spacing:-1px;flex-shrink:0;font-family:Arial,sans-serif}
+.menu-btn{display:flex;align-items:center;gap:5px;background:none;color:#fff;font-size:13px;font-weight:700;padding:6px 10px;border-radius:4px}
+.menu-btn:hover{background:#1a1a1a}
+.menu-btn svg{width:16px;height:16px;fill:currentColor}
+.search-wrap{flex:1;display:flex;max-width:620px;height:38px}
+.search-cat{background:#e8e8e8;color:#333;border:none;padding:0 10px;font-size:13px;font-weight:600;border-radius:4px 0 0 4px;border-right:1px solid #bbb;cursor:pointer;height:100%}
+.search-inp{flex:1;border:none;outline:none;padding:0 12px;font-size:14px;color:#333;height:100%}
+.search-inp::placeholder{color:#888}
+.search-btn{background:var(--gold);border:none;padding:0 14px;border-radius:0 4px 4px 0;height:100%;display:flex;align-items:center}
+.search-btn svg{width:18px;height:18px;fill:#333}
+.nav-r{display:flex;align-items:center;gap:4px;margin-left:auto}
+.imdbpro-logo{display:flex;align-items:center}
+.imdbpro-logo span{color:var(--gold);font-weight:900;font-size:14px}
+.imdbpro-logo sup{color:var(--gold);font-size:9px;font-weight:700}
+.nav-btn{background:none;color:#fff;font-size:13px;font-weight:700;padding:6px 10px;border-radius:4px;white-space:nowrap}
+.nav-btn:hover{background:#1a1a1a}
+.nav-btn.signin{border:1.5px solid #a8a8a8}
+.nav-btn.signin:hover{border-color:#fff}
+.watchlist-btn{display:flex;align-items:center;gap:5px}
+.lang-btn{display:flex;align-items:center;gap:3px}
+
+/* SIGNIN POPUP */
+.signin-popup{position:absolute;top:56px;right:140px;background:#fff;border-radius:8px;padding:20px 24px;width:260px;z-index:2000;box-shadow:0 4px 20px rgba(0,0,0,0.5);display:none}
+.signin-popup.open{display:block}
+.signin-popup-btn{width:100%;background:var(--gold);color:#000;font-weight:700;font-size:15px;padding:10px;border-radius:6px;margin-bottom:14px}
+.signin-popup p{color:#333;font-size:13px;text-align:center}
+.signin-popup a{color:#136CB2;font-weight:700}
+.signin-popup-close{position:absolute;top:10px;right:12px;background:none;border:none;font-size:20px;color:#888;cursor:pointer}
+.popup-triangle{position:absolute;top:-8px;right:40px;width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:8px solid #fff}
+
+/* MEGA MENU */
+.mega{position:fixed;top:56px;left:0;width:280px;background:#1a1a1a;border:1px solid var(--border);border-top:none;z-index:999;display:none;padding:12px 0}
+.mega.open{display:block}
+.mega-sect{padding:8px 16px 4px}
+.mega-sect-title{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-weight:700;padding-bottom:6px;border-bottom:1px solid var(--border);margin-bottom:4px}
+.mega a{display:block;padding:7px 8px;color:var(--text2);font-size:13px;border-radius:4px;transition:background .15s,color .15s}
+.mega a:hover{background:var(--bg3);color:#fff}
+
+/* ── MAIN LAYOUT ── */
+.page{max-width:1280px;margin:0 auto;padding:0 20px}
+
+/* ── HERO ── */
+.hero-section{display:grid;grid-template-columns:1fr 310px;gap:0;margin:0 -20px}
+.hero-player{position:relative;background:#000;display:flex;flex-direction:column}
+
+/* cinematic still — image goes edge to edge, no overlay gradient */
+.hero-img-wrap{position:relative;width:100%;overflow:hidden;flex:1}
+.hero-img{
+  width:100%;height:420px;
+  background:linear-gradient(160deg,#1a1208 0%,#2a1a08 40%,#0a0808 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-size:130px;
+  transition:opacity 0.3s ease;
+  user-select:none;
+}
+
+/* left / right arrow buttons — sit over the image */
+.hero-arr-wrap{
+  position:absolute;top:0;left:0;right:0;bottom:0;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 10px;pointer-events:none;
+}
+.hero-arr{
+  width:46px;height:60px;
+  background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.25);
+  color:#fff;font-size:26px;font-weight:300;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;pointer-events:all;
+  border-radius:4px;
+  transition:background .2s;
+  backdrop-filter:blur(2px);
+  line-height:1;
+}
+.hero-arr:hover{background:rgba(255,255,255,.28)}
+
+/* ── BLACK INFO BAR below the image ── */
+.hero-infobar{
+  background:#000;
+  padding:0 16px 16px 16px;
+  display:flex;
+  align-items:flex-end;   /* children sit on the bottom baseline */
+  gap:16px;
+  min-height:90px;
+  position:relative;
+}
+
+/* tall portrait poster card — rises out of the black bar up into the image */
+.hero-poster-card{
+  flex-shrink:0;
+  width:118px;
+  height:172px;
+  /* negative top margin pulls it up; align-items:flex-end means bottom edge sits at bar bottom */
+  align-self:flex-start;
+  margin-top:-100px;
+  border-radius:5px;
+  overflow:hidden;
+  position:relative;
+  box-shadow:2px 0 18px rgba(0,0,0,.85), -2px 0 18px rgba(0,0,0,.85);
+  background:#111;
+}
+.hero-poster-card-inner{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse at 35% 55%,#3d1d0a 0%,#1a0d20 55%,#060608 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-size:48px;
+}
+/* dark gradient at bottom of poster for text readability */
+.hero-poster-card::after{
+  content:'';
+  position:absolute;bottom:0;left:0;right:0;height:60px;
+  background:linear-gradient(transparent,rgba(0,0,0,.85));
+}
+.hero-poster-title-txt{
+  position:absolute;bottom:14px;left:0;right:0;
+  text-align:center;font-size:8.5px;font-weight:700;
+  color:#f0c040;letter-spacing:.08em;text-transform:uppercase;
+  padding:0 4px;line-height:1.25;z-index:2;
+}
+.hero-poster-date{
+  position:absolute;bottom:4px;left:0;right:0;
+  text-align:center;font-size:8px;color:var(--gold);
+  z-index:2;letter-spacing:.04em;
+}
+.hero-poster-add{
+  position:absolute;top:0;left:0;
+  width:26px;height:26px;
+  background:rgba(0,0,0,.72);
+  color:#fff;font-size:19px;font-weight:300;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;z-index:3;
+  transition:background .15s,color .15s;
+}
+.hero-poster-add:hover{background:var(--gold);color:#000}
+
+/* gold circle play button — sits vertically centered in the bar */
+.hero-play-circle{
+  flex-shrink:0;
+  width:60px;height:60px;
+  border-radius:50%;
+  border:3px solid #fff;
+  background:var(--gold);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  transition:transform .18s,background .18s;
+  box-shadow:0 2px 16px rgba(0,0,0,.6);
+  margin-bottom:10px;       /* lift slightly off bar bottom */
+}
+.hero-play-circle:hover{transform:scale(1.08);background:#e6b800}
+.hero-play-circle svg{width:24px;height:24px;fill:#000;margin-left:4px}
+
+/* text column */
+.hero-text{flex:1;min-width:0;padding-bottom:10px}
+.hero-title-row{
+  display:flex;align-items:baseline;gap:16px;
+  margin-bottom:4px;
+}
+.hero-title{
+  font-size:20px;font-weight:700;color:#fff;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.hero-duration{font-size:17px;font-weight:400;color:#fff;flex-shrink:0}
+.hero-sub{font-size:14px;color:var(--text2);margin-bottom:9px}
+.hero-likes{display:flex;align-items:center;gap:18px;font-size:14px;color:var(--text2)}
+.hero-likes span{display:flex;align-items:center;gap:5px}
+.hero-likes .like-icon{font-size:15px}
+.hero-likes .heart-icon{font-size:13px}
+
+/* UP NEXT */
+.upnext{background:#1a1a1a;padding:0}
+.upnext-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px 8px}
+.upnext-title{font-size:16px;font-weight:700}
+.sponsored{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:4px}
+.upnext-list{display:flex;flex-direction:column}
+.upnext-item{display:flex;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s}
+.upnext-item:hover{background:var(--bg3)}
+.upnext-thumb{width:90px;height:60px;background:#2a2a2a;border-radius:3px;flex-shrink:0;position:relative;overflow:hidden}
+.upnext-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.4)}
+.upnext-play svg{width:24px;height:24px;fill:#fff}
+.upnext-duration{position:absolute;bottom:3px;right:4px;font-size:10px;font-weight:700;background:rgba(0,0,0,.7);color:#fff;padding:1px 4px;border-radius:2px}
+.upnext-info{flex:1;min-width:0}
+.upnext-item-title{font-size:13px;font-weight:700;line-height:1.3;margin-bottom:3px;color:#fff}
+.upnext-item-sub{font-size:12px;color:var(--text2);margin-bottom:5px}
+.upnext-reactions{display:flex;gap:10px;font-size:12px;color:var(--text2)}
+.upnext-reactions span{display:flex;align-items:center;gap:3px}
+.browse-trailers{display:block;padding:12px 14px;color:var(--text);font-size:13px;font-weight:700;border-top:1px solid var(--border)}
+.browse-trailers:hover{text-decoration:underline}
+
+/* ── QUICK LINKS ── */
+.quicklinks{display:flex;gap:10px;padding:16px 0;overflow-x:auto;scrollbar-width:none}
+.quicklinks::-webkit-scrollbar{display:none}
+.qlink{background:none;border:1.5px solid #3a3a3a;color:#fff;font-size:13px;font-weight:600;padding:7px 16px;border-radius:20px;white-space:nowrap;transition:border-color .2s,background .2s}
+.qlink:hover{border-color:#888;background:#1a1a1a}
+.qlink-arrow{color:var(--text2)}
+
+/* ── SECTIONS ── */
+.section{padding:18px 0 6px}
+.section-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.section-bar{width:4px;height:22px;background:var(--gold);border-radius:2px;flex-shrink:0}
+.section-ttl{font-size:20px;font-weight:700}
+.section-ttl a{display:flex;align-items:center;gap:6px}
+.section-ttl a:hover{text-decoration:underline}
+.section-link{color:var(--gold);font-size:13px;font-weight:700;margin-left:auto;white-space:nowrap}
+.section-link:hover{text-decoration:underline}
+.section-sub{color:var(--text2);font-size:13px;margin-top:-6px;margin-bottom:10px}
+.gold-title{color:var(--gold);font-size:22px;font-weight:700;margin-bottom:6px}
+
+/* ── CAROUSELS ── */
+.carousel-wrap{position:relative}
+.carousel-track{display:flex;gap:10px;overflow-x:auto;scroll-behavior:smooth;scrollbar-width:none;padding-bottom:4px}
+.carousel-track::-webkit-scrollbar{display:none}
+.carr-btn{position:absolute;top:50%;transform:translateY(-50%);width:36px;height:80px;background:rgba(0,0,0,.75);border:1px solid #3a3a3a;color:#fff;font-size:22px;display:flex;align-items:center;justify-content:center;z-index:10;cursor:pointer;border-radius:3px}
+.carr-btn:hover{background:rgba(0,0,0,.95)}
+.carr-btn.prev{left:-6px}
+.carr-btn.next{right:-6px}
+
+/* ── FEATURED TODAY ── */
+.featured-grid{
+  display:flex;
+  flex-direction:row;
+  gap:24px;
+  overflow-x:auto;
+  scrollbar-width:none;
+  padding-bottom:4px;
+  align-items:flex-start;
+}
+.featured-grid::-webkit-scrollbar{display:none}
+.featured-block{
+  flex:0 0 380px;
+  min-width:0;
+  cursor:pointer;
+}
+.featured-posters{
+  display:flex;
+  flex-direction:row;
+  gap:3px;
+  height:148px;
+  border-radius:5px;
+  overflow:hidden;
+  margin-bottom:10px;
+}
+.featured-poster-wrap{
+  flex:1;
+  position:relative;
+  overflow:hidden;
+  background:#1a1a2a;
+  min-width:0;
+}
+.featured-poster{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+.featured-poster-label{
+  position:absolute;
+  bottom:5px;
+  left:5px;
+  background:rgba(0,0,0,.72);
+  font-size:10px;
+  color:#fff;
+  padding:2px 6px;
+  border-radius:2px;
+  display:flex;
+  align-items:center;
+  gap:3px;
+  font-weight:600;
+}
+.featured-caption{padding:0}
+.featured-cap-title{font-size:15px;font-weight:700;margin-bottom:5px;line-height:1.35;color:#fff}
+.featured-cap-link{color:var(--blue);font-size:13px}
+.featured-cap-link:hover{text-decoration:underline}
+
+/* ── CELEBS ── */
+.celeb-section{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:8px}
+.celeb-tab{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);padding:6px 12px 6px 0;cursor:pointer;border-bottom:2px solid transparent}
+.celeb-tab.active{color:var(--text);border-bottom-color:var(--gold)}
+.celeb-track{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;padding:10px 0}
+.celeb-track::-webkit-scrollbar{display:none}
+.celeb-card{flex-shrink:0;width:120px;text-align:center;cursor:pointer}
+.celeb-photo-wrap{position:relative;width:100px;height:100px;margin:0 auto 8px;border-radius:50%;overflow:hidden;border:2px solid transparent;transition:border-color .2s}
+.celeb-card:hover .celeb-photo-wrap{border-color:var(--gold)}
+.celeb-photo{width:100%;height:100%;object-fit:cover;display:block;background:#2a2a3a}
+.celeb-heart{position:absolute;bottom:2px;right:2px;width:24px;height:24px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.celeb-rank{font-size:12px;color:var(--text3);margin-bottom:2px}
+.celeb-name{font-size:13px;font-weight:700;line-height:1.2}
+
+/* ── MOVIE CARDS (standard) ── */
+.mcard{flex-shrink:0;width:168px;background:var(--bg2);border-radius:4px;overflow:hidden;cursor:pointer;transition:transform .2s}
+.mcard:hover{transform:scale(1.02)}
+.mcard-poster{width:100%;height:245px;position:relative;overflow:hidden;background:#1a1a2a}
+.mcard-poster img{width:100%;height:100%;object-fit:cover;display:block}
+.mcard-add{position:absolute;top:0;left:0;width:28px;height:28px;background:rgba(0,0,0,.7);color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center}
+.mcard-add:hover{background:var(--gold);color:#000}
+.mcard-body{padding:8px 8px 10px}
+.mcard-rating{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.mcard-star{color:var(--gold);font-size:13px}
+.mcard-starval{font-size:14px;font-weight:700}
+.mcard-star-empty{color:#555;font-size:13px;cursor:pointer}
+.mcard-title{font-size:13px;font-weight:700;line-height:1.3;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.mcard-watchbtn{width:100%;background:rgba(255,255,255,.07);border:none;color:#fff;font-size:12px;font-weight:700;padding:6px;border-radius:3px;display:flex;align-items:center;justify-content:center;gap:5px;margin-bottom:5px;transition:background .15s}
+.mcard-watchbtn:hover{background:rgba(255,255,255,.15)}
+.mcard-trailer{display:flex;align-items:center;justify-content:center;gap:4px;color:var(--text2);font-size:12px;padding:4px 0;cursor:pointer}
+.mcard-trailer:hover{color:#fff}
+.watch-btn-blue{background:rgba(87,153,239,.15);color:var(--blue);border:1px solid rgba(87,153,239,.3)}
+.watch-btn-blue:hover{background:rgba(87,153,239,.25)}
+.showtimes-btn{background:rgba(58,183,87,.15);color:var(--green);border:1px solid rgba(58,183,87,.3)}
+.showtimes-btn:hover{background:rgba(58,183,87,.25)}
+
+/* ── TOP 10 THIS WEEK ── */
+.top10-grid{display:flex;flex-direction:column;gap:12px}
+.top10-bigrow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.top10-big{display:flex;background:var(--bg2);border-radius:6px;overflow:hidden;cursor:pointer;transition:background .15s;min-height:190px}
+.top10-big:hover{background:var(--bg3)}
+.top10-poster{width:130px;flex-shrink:0;position:relative;overflow:hidden}
+.top10-poster img{width:100%;height:100%;object-fit:cover;display:block;background:#1a1a2a}
+.top10-badge{position:absolute;top:6px;left:6px;background:#5799ef;color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;z-index:2}
+.top10-info{padding:12px;flex:1;min-width:0}
+.top10-title{font-size:15px;font-weight:700;margin-bottom:4px;line-height:1.3}
+.top10-meta{color:var(--text2);font-size:12px;margin-bottom:4px}
+.top10-rating{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;margin-bottom:5px}
+.top10-desc{font-size:12px;color:var(--text2);line-height:1.5;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.top10-watch{font-size:12px;color:var(--text3);cursor:pointer;margin-top:6px;display:flex;align-items:center;gap:4px}
+.top10-watch:hover{color:#fff}
+.top10-smallrow{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
+.top10-sm{background:var(--bg2);border-radius:5px;overflow:hidden;cursor:pointer}
+.top10-sm:hover .top10-sm-poster{filter:brightness(1.1)}
+.top10-sm-poster{width:100%;height:110px;position:relative;overflow:hidden}
+.top10-sm-poster img{width:100%;height:100%;object-fit:cover;display:block;background:#1a1a2a}
+.top10-sm-badge{position:absolute;top:5px;left:5px;background:#5799ef;color:#fff;font-size:10px;font-weight:700;padding:2px 5px;border-radius:3px}
+.top10-sm-body{padding:5px 6px 7px}
+.top10-sm-title{font-size:11px;font-weight:700;line-height:1.2;margin-bottom:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.see-all-btn{display:block;width:100%;text-align:center;background:#2a2a2a;border:none;color:#fff;font-size:13px;font-weight:700;padding:10px;border-radius:4px;margin-top:12px;cursor:pointer;transition:background .15s}
+.see-all-btn:hover{background:#3a3a3a}
+
+/* ── BOX OFFICE ── */
+.boxoffice-list{display:grid;grid-template-columns:1fr 1fr;gap:4px 24px}
+.bo-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.bo-num{font-size:16px;font-weight:700;width:18px;flex-shrink:0}
+.bo-add{width:22px;height:22px;background:var(--bg3);color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;border-radius:3px;flex-shrink:0;cursor:pointer}
+.bo-info{flex:1;min-width:0}
+.bo-title{color:var(--blue);font-size:13px;font-weight:700;margin-bottom:1px}
+.bo-title:hover{text-decoration:underline}
+.bo-money{color:var(--text2);font-size:12px}
+.bo-pen{color:var(--blue);font-size:14px;flex-shrink:0}
+
+/* ── POPULAR INTERESTS ── */
+.interests-track{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+.interests-track::-webkit-scrollbar{display:none}
+.interest-card{flex-shrink:0;width:248px;height:100px;border-radius:6px;overflow:hidden;position:relative;cursor:pointer;background:#1a2a3a}
+.interest-bg-fallback{width:100%;height:100%;background:linear-gradient(135deg,#1a2a3a,#2a1a3a)}
+.interest-overlay{position:absolute;inset:0;background:linear-gradient(to right,rgba(0,0,0,.6),transparent)}
+.interest-add{position:absolute;bottom:8px;left:10px;width:22px;height:22px;background:rgba(0,0,0,.7);color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.interest-label{position:absolute;bottom:8px;left:38px;font-size:14px;font-weight:700}
+
+/* ── STREAMING TABS ── */
+.stream-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:12px;overflow-x:auto;scrollbar-width:none}
+.stream-tabs::-webkit-scrollbar{display:none}
+.stab{background:none;border:none;color:var(--text3);font-size:13px;font-weight:700;padding:9px 16px;border-bottom:2px solid transparent;white-space:nowrap;cursor:pointer;text-transform:uppercase;letter-spacing:.03em}
+.stab:hover{color:var(--text)}
+.stab.active{color:var(--text);border-bottom-color:var(--gold)}
+.stream-label{font-size:12px;color:var(--text2);margin-bottom:10px}
+
+/* ── COMING SOON ── */
+.cs-track{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+.cs-track::-webkit-scrollbar{display:none}
+.cs-card{flex-shrink:0;width:310px;background:var(--bg2);border-radius:5px;overflow:hidden;cursor:pointer}
+.cs-thumb{width:100%;height:175px;background:linear-gradient(135deg,#1a2a1a,#2a1a2a);display:flex;align-items:center;justify-content:center;font-size:64px;position:relative}
+.cs-play{position:absolute;bottom:8px;left:8px;width:32px;height:32px;border:2px solid #fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;background:rgba(0,0,0,.5)}
+.cs-duration{position:absolute;bottom:12px;left:48px;font-size:12px;font-weight:700;color:#fff}
+.cs-add-top{position:absolute;top:6px;left:6px;width:22px;height:22px;background:rgba(0,0,0,.7);color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center}
+.cs-body{padding:10px 12px}
+.cs-date{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+.cs-title{font-size:14px;font-weight:700;margin-bottom:6px}
+.cs-reactions{display:flex;gap:12px;font-size:12px;color:var(--text2)}
+.cs-reactions span{display:flex;align-items:center;gap:3px}
+
+/* ── BORN TODAY ── */
+.born-track{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+.born-track::-webkit-scrollbar{display:none}
+.born-card{flex-shrink:0;width:110px;text-align:center;cursor:pointer}
+.born-photo{width:90px;height:90px;border-radius:50%;margin:0 auto 6px;background:#2a2a2a;position:relative;overflow:hidden}
+.born-heart{position:absolute;bottom:2px;right:2px;width:22px;height:22px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px}
+.born-name{font-size:13px;font-weight:700;line-height:1.2;margin-bottom:1px}
+.born-age{font-size:12px;color:var(--text3)}
+
+/* ── TOP NEWS ── */
+.news-layout{display:grid;grid-template-columns:1fr 220px;gap:16px}
+.news-main{}
+.news-big{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.news-big-thumb{width:80px;height:56px;background:#2a2a2a;border-radius:3px;flex-shrink:0;overflow:hidden}
+.news-big-info{}
+.news-big-title{font-size:13px;font-weight:700;line-height:1.4;margin-bottom:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.news-big-title:hover{text-decoration:underline;cursor:pointer}
+.news-big-excerpt{font-size:12px;color:var(--text2);line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.news-big-meta{font-size:11px;color:var(--text3);margin-top:4px}
+.news-small{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.news-small-thumb{width:60px;height:44px;background:#2a2a2a;border-radius:3px;flex-shrink:0;overflow:hidden}
+.news-small-title{font-size:12px;font-weight:700;line-height:1.4;margin-bottom:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.news-small-meta{font-size:11px;color:var(--text3)}
+.news-sidebar{background:var(--bg2);border-radius:5px;padding:12px}
+.more-news-title{font-size:13px;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.03em}
+.news-tags{display:flex;flex-wrap:wrap;gap:6px}
+.news-tag{background:var(--bg3);border:1px solid var(--border);color:var(--text);font-size:12px;padding:5px 12px;border-radius:20px;cursor:pointer;white-space:nowrap;transition:background .15s}
+.news-tag:hover{background:#3a3a3a}
+
+/* ── RECENTLY VIEWED ── */
+.rv-track{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+.rv-track::-webkit-scrollbar{display:none}
+.rv-card{flex-shrink:0;width:140px;cursor:pointer;position:relative}
+.rv-poster{width:100%;height:208px;background:linear-gradient(135deg,#1a1a2a,#2a2a2a);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:52px;position:relative}
+.rv-add{position:absolute;top:0;left:0;width:24px;height:24px;background:rgba(0,0,0,.75);color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center}
+.rv-title{font-size:13px;font-weight:700;margin-top:5px;line-height:1.3}
+
+/* ── WATCHLIST CTA ── */
+.watchlist-cta{text-align:center;padding:24px;border:1px solid var(--border);border-radius:6px;margin:8px 0}
+.watchlist-cta-icon{font-size:32px;margin-bottom:10px}
+.watchlist-cta h3{font-size:16px;font-weight:700;margin-bottom:6px}
+.watchlist-cta p{color:var(--text2);font-size:13px;margin-bottom:14px}
+.watchlist-cta-btn{background:var(--bg3);border:1px solid #5a5a5a;color:#fff;padding:10px 28px;border-radius:4px;font-size:14px;font-weight:700;cursor:pointer;transition:background .15s}
+.watchlist-cta-btn:hover{background:#3a3a3a}
+
+/* ── SIGN IN FOR MORE ── */
+.signin-more{display:flex;justify-content:center;padding:24px 0}
+.signin-more-btn{background:var(--gold);color:#000;font-weight:700;font-size:14px;padding:10px 28px;border-radius:20px;border:none;cursor:pointer;transition:background .15s}
+.signin-more-btn:hover{background:var(--gold-dark)}
+
+/* ── FOOTER ── */
+footer{background:#000;border-top:1px solid #1a1a1a;margin-top:32px}
+.footer-social{max-width:1280px;margin:0 auto;padding:20px 20px 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;border-bottom:1px solid #1a1a1a}
+.follow-label{font-size:13px;font-weight:700;color:var(--text2)}
+.social-icons{display:flex;gap:16px}
+.social-icons a{font-size:20px;color:var(--text2);transition:color .2s}
+.social-icons a:hover{color:#fff}
+.app-section{display:flex;align-items:center;gap:14px}
+.app-section p{font-size:12px;color:var(--text2);text-align:right}
+.qr-code{width:56px;height:56px;background:#fff;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:8px;color:#333;text-align:center;padding:3px;line-height:1.1}
+.footer-links{max-width:1280px;margin:0 auto;padding:14px 20px;display:flex;flex-wrap:wrap;justify-content:center;gap:8px 20px;border-bottom:1px solid #1a1a1a}
+.footer-links a{font-size:12px;color:var(--text2);display:flex;align-items:center;gap:3px}
+.footer-links a:hover{text-decoration:underline;color:#fff}
+.footer-bottom{max-width:1280px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.footer-bottom-links{display:flex;gap:16px;flex-wrap:wrap}
+.footer-bottom-links a{font-size:12px;color:var(--text2)}
+.footer-bottom-links a:hover{text-decoration:underline}
+.amazon-badge{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:4px}
+
+/* ── BACK TO TOP ── */
+.back-top{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;font-size:12px;font-weight:700;padding:7px 16px;border-radius:20px;display:none;align-items:center;gap:5px;z-index:500;cursor:pointer;border:1px solid #555}
+.back-top.show{display:flex}
+.back-top:hover{background:#444}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .hero-section{grid-template-columns:1fr}
+  .upnext{display:none}
+  .top10-grid{grid-template-columns:1fr}
+  .top10-small{grid-template-columns:repeat(4,1fr)}
+  .news-layout{grid-template-columns:1fr}
+}
+@media(max-width:640px){
+  .topbar{padding:0 10px;gap:8px}
+  .nav-btn:not(.signin):not(.watchlist-btn){display:none}
+  .top10-small{grid-template-columns:repeat(3,1fr)}
+  .boxoffice-list{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ── TOPBAR ── -->
+<header class="topbar">
+  <div class="logo">IMDb</div>
+  <button class="menu-btn" id="menuBtn">
+    <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+    Menu
+  </button>
+  <div class="search-wrap">
+    <select class="search-cat"><option>All</option><option>Titles</option><option>Names</option><option>Companies</option></select>
+    <input class="search-inp" type="text" placeholder="Search IMDb" id="searchInp" autocomplete="off">
+    <button class="search-btn"><svg viewBox="0 0 24 24"><path d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" stroke="#333" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg></button>
+  </div>
+  <div class="nav-r">
+    <div class="imdbpro-logo"><span>IMDb<sup>Pro</sup></span></div>
+    <button class="nav-btn watchlist-btn">🔖 Watchlist</button>
+    <button class="nav-btn signin" id="signinBtn">Sign in</button>
+    <button class="nav-btn lang-btn">EN ▾</button>
+  </div>
+</header>
+
+<!-- MEGA MENU -->
+<div class="mega" id="megaMenu">
+  <div class="mega-sect">
+    <div class="mega-sect-title">Movies</div>
+    <a href="#">Release Calendar</a><a href="#">Top 250 Movies</a><a href="#">Most Popular Movies</a><a href="#">Browse by Genre</a><a href="#">Top Box Office</a>
+  </div>
+  <div class="mega-sect">
+    <div class="mega-sect-title">TV Shows</div>
+    <a href="#">What's on TV & Streaming</a><a href="#">Top 250 TV Shows</a><a href="#">Most Popular TV Shows</a>
+  </div>
+  <div class="mega-sect">
+    <div class="mega-sect-title">Awards & Events</div>
+    <a href="#">Oscars</a><a href="#">Emmy Awards</a><a href="#">San Diego Comic-Con</a><a href="#">Cannes Film Festival</a>
+  </div>
+  <div class="mega-sect">
+    <div class="mega-sect-title">Celebs</div>
+    <a href="#">Born Today</a><a href="#">Most Popular Celebs</a>
+  </div>
+  <div class="mega-sect">
+    <div class="mega-sect-title">News</div>
+    <a href="#">Top News</a><a href="#">Movie News</a><a href="#">TV News</a><a href="#">Celebrity News</a>
+  </div>
+</div>
+
+<!-- SIGNIN POPUP -->
+<div class="signin-popup" id="signinPopup">
+  <div class="popup-triangle"></div>
+  <button class="signin-popup-close" id="popupClose">×</button>
+  <button class="signin-popup-btn">Sign in</button>
+  <p>New customer? <a href="#">Create account</a></p>
+</div>
+
+<!-- ── HERO + UP NEXT ── -->
+<div style="max-width:1280px;margin:0 auto;padding:0 20px">
+  <div class="hero-section">
+    <div class="hero-player">
+
+      <!-- cinematic still image -->
+      <div class="hero-img-wrap">
+        <div class="hero-img">
+          <img id="heroBackdrop"
+            src="https://images.assettype.com/nationalherald/2023-12/bc51c2b2-5980-46cd-84e9-dcb71677910f/salaar.jpeg"
+            style="width:100%;height:100%;object-fit:cover;">
+        </div>
+
+        <!-- arrows -->
+        <div class="hero-arr-wrap">
+          <button class="hero-arr" id="heroPrev">&#8249;</button>
+          <button class="hero-arr" id="heroNext">&#8250;</button>
+        </div>
+      </div>
+
+      <!-- info bar -->
+      <div class="hero-infobar">
+
+        <!-- poster -->
+        <div class="hero-poster-card">
+          <div class="hero-poster-card-inner">
+            <img id="heroPoster"
+              src="https://upload.wikimedia.org/wikipedia/en/a/a6/Salaar_Part_1_%E2%80%93_Ceasefire.jpg"
+              style="width:100%;height:100%;object-fit:cover;">
+          </div>
+
+          <div class="hero-poster-title-txt"></div>
+          <div class="hero-poster-date">2025</div>
+          <div class="hero-poster-add">+</div>
+        </div>
+
+        <!-- play -->
+        <div class="hero-play-circle">
+          <svg viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+        </div>
+
+        <!-- text -->
+        <div class="hero-text">
+          <div class="hero-title-row">
+            <div class="hero-title" id="heroTitle">
+              Salaar: Part 1 – Ceasefire
+            </div>
+
+            <div class="hero-duration" id="heroDur">2:32</div>
+          </div>
+
+          <div class="hero-sub" id="heroSub">
+            Watch the Trailer
+          </div>
+
+          <div class="hero-likes">
+            <span>
+              <span class="like-icon">👍</span>
+              <span id="heroLikes">1.5K</span>
+            </span>
+
+            <span>
+              <span class="heart-icon">💛❤️</span>
+              <span id="heroHearts">787</span>
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- UP NEXT -->
+    <div class="upnext">
+      <div class="upnext-header">
+        <div class="upnext-title">Up next</div>
+        <div class="sponsored">Sponsored ℹ</div>
+      </div>
+
+      <div class="upnext-list" id="upnextList"></div>
+
+      <a href="#" class="browse-trailers">
+        Browse trailers ›
+      </a>
+    </div>
+  </div>
+</div>
+
+  <!-- QUICK LINKS -->
+  <div class="quicklinks">
+    <button class="qlink">Summer Watch Guide <span class="qlink-arrow">›</span></button>
+    <button class="qlink">Samurai Cinema <span class="qlink-arrow">›</span></button>
+    <button class="qlink">Cannes Red Carpet <span class="qlink-arrow">›</span></button>
+    <button class="qlink">Star Wars <span class="qlink-arrow">›</span></button>
+  </div>
+
+  <!-- FEATURED TODAY -->
+  <div class="section" style="padding-bottom:4px">
+    <div class="gold-title">Featured today</div>
+    <div id="featuredGrid"></div>
+  </div>
+
+  <!-- MOST POPULAR CELEBS -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-ttl"><a href="#">Most popular celebrities ›</a></div>
+    </div>
+    <div class="celeb-section">
+      <div class="celeb-tab active" onclick="switchCeleb(this,'rising')">Top Rising</div>
+      <div class="celeb-tab" onclick="switchCeleb(this,'ranking')" style="margin-left:16px">By Ranking</div>
+    </div>
+    <div class="carousel-wrap">
+      <button class="carr-btn prev" onclick="scrollC('celebTrack',-1)">‹</button>
+      <div class="celeb-track" id="celebTrack"></div>
+      <button class="carr-btn next" onclick="scrollC('celebTrack',1)">›</button>
+    </div>
+  </div>
+
+  <!-- WHAT TO WATCH -->
+  <div class="section">
+    <div class="gold-title">What to watch</div>
+    <a href="#" class="section-link" style="display:inline-block;margin-bottom:10px">Get more recommendations ›</a>
+    <div class="section-head">
+      <div class="section-bar"></div>
+      <div style="font-size:16px;font-weight:700"><a href="#">Top picks ›</a></div>
+    </div>
+    <div style="color:var(--text2);font-size:13px;margin-bottom:6px">TV shows and movies just for you</div>
+    <div style="color:var(--blue);font-size:13px;margin-bottom:10px;cursor:pointer">Sign in</div>
+    <div class="carousel-wrap">
+      <button class="carr-btn prev" onclick="scrollC('topPicksTrack',-1)">‹</button>
+      <div class="carousel-track" id="topPicksTrack"></div>
+      <button class="carr-btn next" onclick="scrollC('topPicksTrack',1)">›</button>
+    </div>
+  </div>
+
+  <!-- FROM WATCHLIST -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-bar"></div>
+      <div style="font-size:16px;font-weight:700"><a href="#">From your Watchlist ›</a></div>
+    </div>
+    <div class="watchlist-cta">
+      <div class="watchlist-cta-icon">+</div>
+      <h3>Sign in to access your Watchlist</h3>
+      <p>Save shows and movies to keep track of what you want to watch.</p>
+      <button class="watchlist-cta-btn">Sign in to IMDb</button>
+    </div>
+  </div>
+
+  <!-- TOP 10 THIS WEEK -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-bar"></div>
+      <div class="section-ttl"><a href="#">Top 10 on IMDb this week ›</a></div>
+    </div>
+    <div class="top10-grid" id="top10Grid"></div>
+    <button class="see-all-btn">See all</button>
+  </div>
+
+  <!-- FAN FAVORITES -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-bar"></div>
+      <div style="font-size:16px;font-weight:700"><a href="#">Fan favorites ›</a></div>
+    </div>
+    <div style="color:var(--text2);font-size:13px;margin-bottom:12px">This week's top TV and movies</div>
+    <div class="carousel-wrap">
+      <button class="carr-btn prev" onclick="scrollC('fanTrack',-1)">‹</button>
+      <div class="carousel-track" id="fanTrack"></div>
+      <button class="carr-btn next" onclick="scrollC('fanTrack',1)">›</button>
+    </div>
+  </div>
+
+  <!-- POPULAR INTERESTS -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-bar"></div>
+      <div style="font-size:16px;font-weight:700"><a href="#">Popular interests ›</a></div>
+    </div>
+    <div class="carousel-wrap">
+      <button class="carr-btn prev" onclick="scrollC('interestsTrack',-1)">‹</button>
+      <div class="interests-track" id="interestsTrack"></div>
+      <button class="carr-btn next" onclick="scrollC('interestsTrack',1)">›</button>
+    </div>
+  </div>
+
+  <!-- EXPLORE MOVIES & TV -->
+  <div class="section">
+    <div class="gold-title">Explore movies &amp; TV shows</div>
+
+    <!-- IN THEATERS -->
+    <div style="margin-top:16px">
+      <div class="section-head" style="margin-bottom:4px">
+        <div class="section-bar"></div>
+        <div style="font-size:16px;font-weight:700"><a href="#">In theaters ›</a></div>
+      </div>
+      <div style="color:var(--text2);font-size:13px;margin-bottom:10px">Showtimes near you</div>
+      <div class="carousel-wrap">
+        <button class="carr-btn prev" onclick="scrollC('theatersTrack',-1)">‹</button>
+        <div class="carousel-track" id="theatersTrack"></div>
+        <button class="carr-btn next" onclick="scrollC('theatersTrack',1)">›</button>
+      </div>
+    </div>
+
+    <!-- TOP BOX OFFICE -->
+    <div style="margin-top:24px">
+      <div class="section-head" style="margin-bottom:4px">
+        <div class="section-bar"></div>
+        <div style="font-size:16px;font-weight:700"><a href="#">Top box office (US) ›</a></div>
+      </div>
+      <div style="color:var(--text2);font-size:13px;margin-bottom:12px">Weekend of May 15–17</div>
+      <div class="boxoffice-list" id="boxofficeList"></div>
+    </div>
+
+    <!-- COMING SOON TO THEATERS -->
+    <div style="margin-top:24px">
+      <div class="section-head" style="margin-bottom:4px">
+        <div class="section-bar"></div>
+        <div style="font-size:16px;font-weight:700"><a href="#">Coming soon to theaters ›</a></div>
+      </div>
+      <div style="color:var(--text2);font-size:13px;margin-bottom:10px">Trailers for upcoming releases</div>
+      <div class="carousel-wrap">
+        <button class="carr-btn prev" onclick="scrollC('csTrack',-1)">‹</button>
+        <div class="cs-track" id="csTrack"></div>
+        <button class="carr-btn next" onclick="scrollC('csTrack',1)">›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPLORE STREAMING -->
+  <div class="section">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div class="gold-title" style="margin-bottom:0">Explore what's streaming</div>
+      <a href="#" style="color:var(--blue);font-size:13px;white-space:nowrap">⚙ Set your preferred services</a>
+    </div>
+    <div class="stream-tabs">
+      <button class="stab active" onclick="switchStream(this)">Prime Video</button>
+      <button class="stab" onclick="switchStream(this)">Apple TV</button>
+      <button class="stab" onclick="switchStream(this)">JioCinema</button>
+      <button class="stab" onclick="switchStream(this)">SonyLIV</button>
+      <button class="stab" onclick="switchStream(this)">Netflix</button>
+      <button class="stab" onclick="switchStream(this)">ZEE5</button>
+      <button class="stab" onclick="switchStream(this)">SunNXT</button>
+    </div>
+    <div class="stream-label" id="streamLabel">Included with Prime</div>
+    <div class="carousel-wrap">
+      <button class="carr-btn prev" onclick="scrollC('streamTrack',-1)">‹</button>
+      <div class="carousel-track" id="streamTrack"></div>
+      <button class="carr-btn next" onclick="scrollC('streamTrack',1)">›</button>
+    </div>
+  </div>
+
+  <!-- MORE TO EXPLORE -->
+  <div class="section">
+    <div class="gold-title">More to explore</div>
+
+    <!-- BORN TODAY -->
+    <div style="margin-top:16px">
+      <div class="section-head" style="margin-bottom:4px">
+        <div class="section-bar"></div>
+        <div style="font-size:16px;font-weight:700"><a href="#">Born today ›</a></div>
+      </div>
+      <div style="color:var(--text2);font-size:13px;margin-bottom:10px">People born on May 20</div>
+      <div class="carousel-wrap">
+        <button class="carr-btn prev" onclick="scrollC('bornTrack',-1)">‹</button>
+        <div class="born-track" id="bornTrack"></div>
+        <button class="carr-btn next" onclick="scrollC('bornTrack',1)">›</button>
+      </div>
+    </div>
+
+    <!-- TOP NEWS -->
+    <div style="margin-top:24px">
+      <div class="section-head" style="margin-bottom:10px">
+        <div class="section-bar"></div>
+        <div style="font-size:16px;font-weight:700"><a href="#">Top news ›</a></div>
+      </div>
+      <div class="news-layout" id="newsLayout"></div>
+    </div>
+  </div>
+
+  <!-- RECENTLY VIEWED -->
+  <div class="section">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div style="font-size:18px;font-weight:700">Recently viewed</div>
+      <a href="#" style="color:var(--blue);font-size:13px">Clear all</a>
+    </div>
+    <div class="rv-track" id="rvTrack"></div>
+  </div>
+
+  <!-- SIGN IN FOR MORE -->
+  <div class="signin-more">
+    <button class="signin-more-btn">Sign in for more access</button>
+  </div>
+
+</div><!-- /page -->
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-social">
+    <div>
+      <div class="follow-label" style="margin-bottom:10px">Follow IMDb on social</div>
+      <div class="social-icons">
+        <a href="#" title="TikTok">🎵</a>
+        <a href="#" title="Instagram">📸</a>
+        <a href="#" title="X/Twitter">𝕏</a>
+        <a href="#" title="YouTube">▶</a>
+        <a href="#" title="Facebook">📘</a>
+      </div>
+    </div>
+    <div class="app-section">
+      <div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:3px">Get the IMDb App</div>
+        <div style="font-size:12px;color:var(--text2)">For Android and iOS</div>
+      </div>
+      <div class="qr-code">QR<br>CODE</div>
+    </div>
+  </div>
+  <div class="footer-links">
+    <a href="#">Help ↗</a>
+    <a href="#">Site Index ↗</a>
+    <a href="#">IMDbPro ↗</a>
+    <a href="#">Box Office Mojo ↗</a>
+    <a href="#">License IMDb Data ↗</a>
+    <a href="#">Press Room</a>
+    <a href="#">Advertising ↗</a>
+    <a href="#">Jobs ↗</a>
+    <a href="#">Conditions of Use</a>
+    <a href="#">Privacy Policy</a>
+    <a href="#">Your Ads Privacy Choices</a>
+  </div>
+  <div class="footer-bottom">
+    <div class="amazon-badge">an amazon company</div>
+    <div style="font-size:11px;color:var(--text3)">© 1990–2026 by IMDb.com, Inc.</div>
+  </div>
+</footer>
+
+<!-- BACK TO TOP -->
+<div class="back-top" id="backTop">▲ Back to top</div>
+
+<script>
+// ─── ALL IMAGE URLs ──────────────────────────────────────
+// Using IMDB media-amazon CDN (exact IDs) + picsum fallback
+
+// MOVIE POSTERS — IMDB primary image CDN (always loads)
+const P2  = 'https://upload.wikimedia.org/wikipedia/en/1/11/Pushpa_2-_The_Rule.jpg';
+const KGF = 'https://m.media-amazon.com/images/M/MV5BM2M0YmIxNzItOWI4My00MmQzLWE0NGYtZTM3NjllNjIwZjc5XkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg';
+const RRR = 'https://upload.wikimedia.org/wikipedia/en/thumb/d/d7/RRR_Poster.jpg/250px-RRR_Poster.jpg';
+const BB2 = 'https://upload.wikimedia.org/wikipedia/en/thumb/9/93/Baahubali_2_The_Conclusion_poster.jpg/250px-Baahubali_2_The_Conclusion_poster.jpg';
+const BB1 = 'https://upload.wikimedia.org/wikipedia/en/thumb/0/04/HHVM_-_New_release_date.jpeg/250px-HHVM_-_New_release_date.jpeg';
+const DEV = 'https://m.media-amazon.com/images/M/MV5BYmI5NTljYWItMDhjMC00NDQwLWFhMjQtNWNjNDYzYzkwNGQ0XkEyXkFqcGc@._V1_QL75_UY281_CR18,0,190,281_.jpg';
+const SAL = 'https://upload.wikimedia.org/wikipedia/en/a/a6/Salaar_Part_1_%E2%80%93_Ceasefire.jpg';
+const LEO = 'https://upload.wikimedia.org/wikipedia/en/7/75/Leo_%282023_Indian_film%29.jpg';
+const PS1 = 'https://m.media-amazon.com/images/M/MV5BYzZjYzU0OGMtODI1OS00MjU5LThlOTAtZjY2NmZlOTVlMmE5XkEyXkFqcGc@._V1_.jpg';
+const VIK = 'https://upload.wikimedia.org/wikipedia/en/thumb/9/95/Thug_Life_2025.jpg/250px-Thug_Life_2025.jpg';
+const JAI = 'https://upload.wikimedia.org/wikipedia/en/thumb/c/cb/Jailer_2023_Tamil_film_poster.jpg/250px-Jailer_2023_Tamil_film_poster.jpg';
+const KAL = 'https://m.media-amazon.com/images/M/MV5BMmMwNjkyMTItMjgzYS00YjE0LWJmNjQtYzkwMDQ5ZjZiNTE4XkEyXkFqcGdeQXVyMTY1NDY4NTIw._V1_UX182_CR0,0,182,268_AL_.jpg';
+const ATM = 'https://m.media-amazon.com/images/M/MV5BNzY1NWUwOTYtMGIwMy00NmZhLThlYjYtOGQ1MmJjNTg1NDQ1XkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg';
+
+// CELEBRITY PHOTOS — Wikipedia Commons (verified free-license files)
+const C_NTR = 'https://images.zoomnews.com/photo/msid-152859346.jpg?width=1280&height=720&thumbsize=72911';
+const C_RC  = 'https://m.media-amazon.com/images/M/MV5BZWY1NTQyMWItMWU2OS00NWMwLWFlN2MtMDZlYzEwZmU3MTYzXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg';
+const C_AA  = 'https://upload.wikimedia.org/wikipedia/commons/0/09/Allu_Arjun_at_Pushpa_2_The_Rule_meet.jpg';
+const C_RAJ = 'https://femina.wwmindia.com/content/2025/nov/rajinikanth--thumb1762323227.jpg';
+const C_VIJ = 'https://m.media-amazon.com/images/I/71Zg6RRQzsL._AC_UF894,1000_QL80_.jpg';
+const C_PRB = 'https://www.acmodasi.in/amdb/images/persons/q/t/prabhas-21440.jpg';
+const C_YSH = 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Yash%2C_Vishal%2C_Srinidhi_Shetty_at_the_%E2%80%98KGF%E2%80%99_Press_Meet_In_Chennai_%28cropped%29.jpg/250px-Yash%2C_Vishal%2C_Srinidhi_Shetty_at_the_%E2%80%98KGF%E2%80%99_Press_Meet_In_Chennai_%28cropped%29.jpg';
+const C_MHB = 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Mahesh_Babu_in_Spyder_%28cropped%29.jpg/250px-Mahesh_Babu_in_Spyder_%28cropped%29.jpg';
+// BACKDROP STILLS for Up Next / News thumbnails
+// Using IMDB CDN landscape stills (same reliable CDN)
+const UN1 = 'https://d1nslcd7m2225b.cloudfront.net/Pictures/1024x536/0/5/0/1392050_myp_4353_creditdvventertainments_597835.jpg';
+const UN2 = 'https://i.ytimg.com/vi/Ser0vvLxHyU/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLByk6ycbbcmuBgcD4zHQjNwqQvkaw';
+const UN3 = 'https://s.yimg.com/ny/api/res/1.2/gb6VSC3HSA3sUFdHwSivWA--/YXBwaWQ9aGlnaGxhbmRlcjt3PTEyNDI7aD02ODA7Y2Y9d2VicA--/https://media.zenfs.com/en/time_72/a1a86d68a1dff08f0bb28ebd697eb572';
+const UN4 = 'https://i.ytimg.com/vi/vsoGho92_ik/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLB_xSrhGbEHYQIUPGmD4ujqLtuQQA';
+const UN5 = 'https://images.news18.com/ibnlive/uploads/2025/04/Jr-NTR-Devara-Part-2-2025-04-0ec81ced91db7f38b550488e728343f4.jpg';
+
+const NEWS1 = "https://cdn.dnaindia.com/sites/default/files/2023/03/13/2578571-untitled-design-2023-03-13t084643.695.png?im=FitAndFill=(1280,960)";
+const NEWS2 = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS7uqw_-vrbxvTsTEZpNR5Ott3Lpn55kXutLw&s";
+const NEWS3 = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkSPIgEAc5KoAiNibNKz0iwd8s1rF3uomtVQ&s";
+const NEWS4 = "https://aniportalimages.s3.amazonaws.com/media/details/ANI-20230916065747.jpeg";
+const NEWS5 = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRl_VPIV4fIWp_gmhLRgpE7dmlcPfOSC23TUA&s";
+
+// Picsum fallbacks (always load — used only if primary fails)
+function ps(id){return 'https://picsum.photos/id/'+id+'/182/268';}
+function psw(id){return 'https://picsum.photos/id/'+id+'/477/268';}
+const F={
+  P2:ps(11),KGF:ps(22),RRR:ps(33),BB2:ps(44),BB1:ps(55),DEV:ps(66),
+  SAL:ps(77),LEO:ps(88),PS1:ps(99),VIK:ps(10),JAI:ps(20),KAL:ps(30),
+  ATM:ps(40),
+  U1:psw(1),U2:psw(2),U3:psw(3),U4:psw(4),U5:psw(5),
+  C:ps(50)
+};
+
+// ─── DATA ───────────────────────────────────────────────
+const upnextData = [
+  {img:UN1, fb:F.U1, title:"RRR — Naatu Naatu Behind The Scenes", sub:"Watch the exclusive clip", dur:"5:19", likes:1500, hearts:787},
+  {img:UN2, fb:F.U2, title:"KGF Chapter 2 — Rocky's Rise Explained", sub:"Watch Now", dur:"8:00", likes:1200, hearts:654},
+  {img:UN3, fb:F.U3, title:"Baahubali — The Epic Battle Breakdown", sub:"Watch the featurette", dur:"3:45", likes:890, hearts:430},
+  {img:UN4, fb:F.U4, title:"Vikram — Lokesh Universe Explained", sub:"Watch the teaser", dur:"2:12", likes:600, hearts:280},
+  {img:UN5, fb:F.U5, title:"Devara — Jr. NTR's Most Intense Role Yet", sub:"Watch the Teaser", dur:"1:49", likes:397, hearts:245},
+];
+
+const featuredData = [
+  {imgs:[{s:P2,f:F.P2},{s:KGF,f:F.KGF},{s:RRR,f:F.RRR}], label:"Staff Picks: What to Watch in May", link:"See our picks"},
+  {imgs:[{s:LEO,f:F.LEO},{s:DEV,f:F.DEV},{s:PS1,f:F.PS1}], label:"Top 10 Highest-Grossing Telugu & Tamil Films", link:"See the rankings"},
+];
+
+const celebsData = [
+  {name:"Jr. NTR",     rank:"1 (▲9,473)", img:C_NTR, fb:F.C},
+  {name:"Ram Charan",  rank:"2 (▲6,465)", img:C_RC,  fb:F.C},
+  {name:"Allu Arjun",  rank:"3 (▲1,354)", img:C_AA,  fb:F.C},
+  {name:"Rajinikanth", rank:"4 (▲35)",    img:C_RAJ, fb:F.C},
+  {name:"Vijay",       rank:"5 (▲12)",    img:C_VIJ, fb:F.C},
+  {name:"Prabhas",     rank:"6 (▲8)",     img:C_PRB, fb:F.C},
+  {name:"Yash",        rank:"7 (▲22)",    img:C_YSH, fb:F.C},
+  {name:"Mahesh Babu", rank:"8 (▲15)",    img:C_MHB, fb:F.C},
+];
+
+const topPicksData = [
+  {title:"Pushpa 2: The Rule", rating:"7.8", img:P2,  fb:F.P2,  year:2024},
+  {title:"KGF: Chapter 2",     rating:"8.4", img:KGF, fb:F.KGF, year:2022},
+  {title:"RRR",                rating:"7.8", img:RRR, fb:F.RRR, year:2022},
+  {title:"Baahubali 2",        rating:"8.1", img:BB2, fb:F.BB2, year:2017},
+  {title:"Devara",             rating:"6.6", img:DEV, fb:F.DEV, year:2024},
+  {title:"Salaar",             rating:"7.4", img:SAL, fb:F.SAL, year:2023},
+];
+
+const top10Data = [
+  {title:"Pushpa 2: The Rule", img:P2,  fb:F.P2,  meta:"Movie · 2025 · UA", rating:"8.6", votes:"872K",
+   desc:"Pushpa Raj expands his red sandalwood smuggling empire and faces a fierce new rivalry in this record-breaking sequel.", badge:"#1"},
+  {title:"KGF",             img:KGF, fb:F.KGF, meta:"Movie · 2025 · UA", rating:"8.2", votes:"500K",
+   desc:"Yash headlines PrasanthNell's high-octane action thriller set against a backdrop of crime and vengeance.", badge:"#2"},
+  {title:"Devara",             img:DEV, fb:F.DEV, meta:"Movie · 2025 · UA", rating:"8.5", votes:"650K",
+   desc:"Jr. NTR stars in a coastal action drama spanning two generations, filled with revenge, power and betrayal.", badge:"#3"},
+];
+
+const top10SmData = [
+  {title:"OG",                   img:ATM, fb:F.ATM, badge:"#4"},
+  {title:"Thug Life",            img:VIK, fb:F.VIK, badge:"#5"},
+  {title:"Hari Hara Veera Mallu",img:BB1, fb:F.BB1, badge:"#6"},
+  {title:"Retro",                img:PS1, fb:F.PS1, badge:"#7"},
+  {title:"Salaar",              img:SAL, fb:F.SAL, badge:"#8"},
+  {title:"Leo",                  img:LEO, fb:F.LEO, badge:"#9"},
+  {title:"Jailer 2",             img:JAI, fb:F.JAI, badge:"#10"},
+];
+
+const fanData = [
+  {title:"Pushpa 2: The Rule", rating:"7.8", img:P2,  fb:F.P2,  year:2024},
+  {title:"KGF: Chapter 2",     rating:"8.4", img:KGF, fb:F.KGF, year:2022},
+  {title:"RRR",                rating:"7.8", img:RRR, fb:F.RRR, year:2022},
+  {title:"Devara",             rating:"6.6", img:DEV, fb:F.DEV, year:2024},
+  {title:"Salaar",             rating:"7.4", img:SAL, fb:F.SAL, year:2023},
+  {title:"Leo",                rating:"7.3", img:LEO, fb:F.LEO, year:2023},
+];
+
+const interestsData = [
+  {label:"Drama",    img:RRR, fb:F.RRR},
+  {label:"Horror",   img:SAL, fb:F.SAL},
+  {label:"Telugu",   img:P2,  fb:F.P2},
+  {label:"Thriller", img:LEO, fb:F.LEO},
+  {label:"Action",   img:KGF, fb:F.KGF},
+  {label:"Tamil",    img:DEV, fb:F.DEV},
+];
+
+const theatersData = [
+  {title:"Pushpa 2",        rating:"7.8", img:P2,  fb:F.P2},
+  {title:"RRR",             rating:"7.8", img:RRR, fb:F.RRR},
+  {title:"Devara",          rating:"6.6", img:DEV, fb:F.DEV},
+  {title:"Salaar",          rating:"7.4", img:SAL, fb:F.SAL},
+  {title:"KGF: Chapter 2",  rating:"8.4", img:KGF, fb:F.KGF},
+  {title:"Leo",             rating:"7.3", img:LEO, fb:F.LEO},
+];
+
+const streamData = [
+  {title:"Pushpa 2: The Rule", img:P2,  fb:F.P2,  rating:"7.8"},
+  {title:"RRR",                img:RRR, fb:F.RRR, rating:"7.8"},
+  {title:"KGF: Chapter 2",     img:KGF, fb:F.KGF, rating:"8.4"},
+  {title:"Baahubali 2",        img:BB2, fb:F.BB2, rating:"8.1"},
+  {title:"Salaar",             img:SAL, fb:F.SAL, rating:"7.4"},
+  {title:"Leo",                img:LEO, fb:F.LEO, rating:"7.3"},
+];
+
+const boxOfficeData = [
+  {rank:1, title:"Pushpa 2: The Rule",  opening:"₹294Cr", total:"₹1832Cr"},
+  {rank:2, title:"KGF: Chapter 2",      opening:"₹134Cr", total:"₹1200Cr"},
+  {rank:3, title:"RRR",                 opening:"₹223Cr", total:"₹900Cr"},
+  {rank:4, title:"Baahubali 2",         opening:"₹121Cr", total:"₹1810Cr"},
+  {rank:5, title:"Leo",                 opening:"₹141Cr", total:"₹619Cr"},
+  {rank:6, title:"Salaar",              opening:"₹95Cr",  total:"₹454Cr"},
+];
+
+const comingSoonData = [
+  {title:"OG",                    date:"JUN 2026", dur:"2:32", img:ATM, fb:F.RRR, likes:1500, hearts:787},
+  {title:"Hari Hara Veera Mallu", date:"JUL 2026", dur:"2:15", img:BB1, fb:F.BB2, likes:890,  hearts:430},
+  {title:"Thug Life",             date:"AUG 2026", dur:"2:45", img:VIK, fb:F.VIK, likes:1100, hearts:560},
+];
+
+const bornData = [
+  {name:"Jr. NTR",      age:41, img:C_NTR, fb:F.C},
+  {name:"Ram Charan",   age:39, img:C_RC,  fb:F.C},
+  {name:"Allu Arjun",   age:42, img:C_AA,  fb:F.C},
+  {name:"Rajinikanth",  age:74, img:C_RAJ, fb:F.C},
+  {name:"Vijay",        age:50, img:C_VIJ, fb:F.C},
+  {name:"Prabhas",      age:45, img:C_PRB, fb:F.C},
+];
+
+const newsData = [
+  {img:NEWS1, fb:F.U1,
+   title:"RRR wins Oscar for Best Original Song — Naatu Naatu makes history at the Academy Awards",
+   excerpt:"SS Rajamouli's RRR became the first Indian film to win an Academy Award for Best Original Song.",
+   meta:"May 20 · The Hollywood Reporter · Movie News", big:true},
+  {img:NEWS2, fb:F.U2,
+   title:"Pushpa 2: The Rule crosses ₹1800 Crore worldwide — becomes biggest Indian film ever",
+   meta:"May 19 · Variety · Film News", big:false},
+  {img:NEWS3, fb:F.U3,
+   title:"KGF Chapter 3 officially announced — Yash confirmed to return as Rocky Bhai",
+   meta:"May 19 · Variety · Film News", big:false},
+  {img:NEWS4, fb:F.U4,
+   title:"Jr. NTR wins Best Actor at IIFA 2026 for Devara — dedicates award to SS Rajamouli",
+   meta:"May 19 · Variety · Telugu News", big:false},
+  {img:NEWS5, fb:F.U5,
+   title:"Allu Arjun's Pushpa 3 officially announced — shoot begins early 2027",
+   meta:"May 18 · The Hollywood Reporter · Movie News", big:false},
+];
+
+const rvData = [
+  {title:"Pushpa 2: The Rule", img:P2,  fb:F.P2},
+  {title:"RRR",                img:RRR, fb:F.RRR},
+];
+
+// ─── RENDER ──────────────────────────────────────────────
+// i() = img with primary src, picsum fallback, then hide
+function i(s,f,a,c,st){
+  const cc=c?` class="${c}"`:'';
+  const ss=st?` style="${st}"`:'';
+  const fb=f||'https://picsum.photos/seed/'+encodeURIComponent(a||'x')+'/300/450';
+  return `<img src="${s}" alt="${a||''}"${cc}${ss} loading="lazy"
+    onerror="if(!this._d){this._d=1;this.src='${fb}';}else{this.style.visibility='hidden';}">`;
+}
+
+function renderUpnext() {
+  document.getElementById('upnextList').innerHTML = upnextData.map(u=>`
+    <div class="upnext-item">
+      <div class="upnext-thumb" style="position:relative;overflow:hidden">
+        ${i(u.img,u.fb,u.title,'','position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;')}
+        <div class="upnext-play"><svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg></div>
+        <div class="upnext-duration">${u.dur}</div>
+      </div>
+      <div class="upnext-info">
+        <div class="upnext-item-title">${u.title}</div>
+        <div class="upnext-item-sub">${u.sub}</div>
+        <div class="upnext-reactions">
+          <span>👍 ${u.likes}</span>
+          <span>💛❤️ ${u.hearts}</span>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function renderFeatured() {
+  document.getElementById('featuredGrid').innerHTML = featuredData.map(f=>`
+    <div class="featured-block">
+      <div class="featured-posters">
+        ${f.imgs.map((im,idx)=>`
+          <div class="featured-poster-wrap">
+            ${i(im.s,im.f,'','featured-poster','')}
+            ${idx===0||idx===2?'<div class="featured-poster-label">☰ List</div>':''}
+          </div>`).join('')}
+      </div>
+      <div class="featured-caption">
+        <div class="featured-cap-title">${f.label}</div>
+        <a href="#" class="featured-cap-link">${f.link}</a>
+      </div>
+    </div>`).join('');
+}
+
+function renderCelebs() {
+  document.getElementById('celebTrack').innerHTML = celebsData.map(c=>`
+    <div class="celeb-card">
+      <div class="celeb-photo-wrap">
+        ${i(c.img,c.fb,c.name,'celeb-photo','')}
+        <div class="celeb-heart">🤍</div>
+      </div>
+      <div class="celeb-rank">${c.rank}</div>
+      <div class="celeb-name">${c.name}</div>
+    </div>`).join('');
+}
+
+function renderCarousel(id,items,type){
+  const el=document.getElementById(id); if(!el) return;
+  const btnCls=type==='showtimes'?'showtimes-btn':'watch-btn-blue';
+  const btnTxt=type==='showtimes'?'🎬 Showtimes':'Watch options';
+  el.innerHTML=items.map(m=>`
+    <div class="mcard">
+      <div class="mcard-poster">
+        <div class="mcard-add">+</div>
+        ${i(m.img,m.fb,m.title,'','width:100%;height:100%;object-fit:cover;display:block;')}
+      </div>
+      <div class="mcard-body">
+        <div class="mcard-rating">
+          <span class="mcard-star">★</span>
+          <span class="mcard-starval">${m.rating}</span>
+          <span class="mcard-star-empty" style="margin-left:auto">☆</span>
+        </div>
+        <div class="mcard-title">${m.title}</div>
+        <button class="mcard-watchbtn ${btnCls}">${btnTxt}</button>
+        <div class="mcard-trailer">▶ Trailer &nbsp; ℹ</div>
+      </div>
+    </div>`).join('');
+}
+
+function renderTop10(){
+  const bigHtml=`<div class="top10-bigrow">${top10Data.map(t=>`
+    <div class="top10-big">
+      <div class="top10-poster">
+        <div class="top10-badge">${t.badge}</div>
+        ${i(t.img,t.fb,t.title,'','width:100%;height:100%;object-fit:cover;display:block;')}
+      </div>
+      <div class="top10-info">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px">${t.badge}</div>
+        <div class="top10-title">${t.title}</div>
+        <div class="top10-meta">${t.meta}</div>
+        <div class="top10-rating"><span style="color:var(--gold)">★</span> ${t.rating}
+          <span style="color:var(--text3);font-size:12px">(${t.votes})</span>
+          <a href="#" style="color:var(--gold);font-size:12px">☆ Rate</a></div>
+        <div class="top10-watch">👁 Mark as watched</div>
+        <div class="top10-desc">${t.desc}</div>
+      </div>
+    </div>`).join('')}</div>`;
+  const smHtml=`<div class="top10-smallrow">${top10SmData.map(t=>`
+    <div class="top10-sm">
+      <div class="top10-sm-poster">
+        <div class="top10-sm-badge">${t.badge}</div>
+        ${i(t.img,t.fb,t.title,'','width:100%;height:100%;object-fit:cover;display:block;')}
+      </div>
+      <div class="top10-sm-body"><div class="top10-sm-title">${t.title}</div></div>
+    </div>`).join('')}</div>`;
+  document.getElementById('top10Grid').innerHTML=bigHtml+smHtml;
+}
+
+function renderBoxOffice(){
+  document.getElementById('boxofficeList').innerHTML=boxOfficeData.map(b=>`
+    <div class="bo-item">
+      <div class="bo-num">${b.rank}</div><div class="bo-add">+</div>
+      <div class="bo-info">
+        <div class="bo-title">${b.title}</div>
+        <div class="bo-money">${b.opening} · Total ${b.total}</div>
+      </div>
+      <div class="bo-pen">✏</div>
+    </div>`).join('');
+}
+
+function renderInterests(){
+  document.getElementById('interestsTrack').innerHTML=interestsData.map(it=>`
+    <div class="interest-card">
+      ${i(it.img,it.fb,it.label,'','position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;')}
+      <div class="interest-overlay"></div>
+      <div class="interest-add">+</div>
+      <div class="interest-label">${it.label}</div>
+    </div>`).join('');
+}
+
+function renderComingSoon(){
+  document.getElementById('csTrack').innerHTML=comingSoonData.map(c=>`
+    <div class="cs-card">
+      <div class="cs-thumb" style="position:relative;overflow:hidden;">
+        <div class="cs-add-top">+</div>
+        ${i(c.img,c.fb,c.title,'','position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;')}
+        <div class="cs-play">▶</div>
+        <div class="cs-duration">${c.dur}</div>
+      </div>
+      <div class="cs-body">
+        <div class="cs-date">${c.date}</div>
+        <div class="cs-title">${c.title}</div>
+        <div class="cs-reactions">
+          <span>👍 ${c.likes}</span><span>❤️ ${c.hearts}</span>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function renderBorn(){
+  document.getElementById('bornTrack').innerHTML=bornData.map(b=>`
+    <div class="born-card">
+      <div class="born-photo" style="overflow:hidden;">
+        ${i(b.img,b.fb,b.name,'','width:100%;height:100%;object-fit:cover;display:block;border-radius:50%;')}
+        <div class="born-heart">🤍</div>
+      </div>
+      <div class="born-name">${b.name}</div>
+      <div class="born-age">${b.age}</div>
+    </div>`).join('');
+}
+
+function renderNews(){
+  const big=newsData.find(n=>n.big);
+  const smalls=newsData.filter(n=>!n.big);
+  document.getElementById('newsLayout').innerHTML=`
+    <div class="news-main">
+      <div class="news-big">
+        <div class="news-big-thumb">
+          ${i(big.img,big.fb,'news','','width:100%;height:100%;object-fit:cover;border-radius:3px;display:block;')}
+        </div>
+        <div class="news-big-info">
+          <div class="news-big-title">${big.title}</div>
+          <div class="news-big-excerpt">${big.excerpt||''}</div>
+          <div class="news-big-meta">${big.meta}</div>
+        </div>
+      </div>
+      ${smalls.map(n=>`
+      <div class="news-small">
+        <div class="news-small-thumb">
+          ${i(n.img,n.fb,'','','width:100%;height:100%;object-fit:cover;border-radius:3px;display:block;')}
+        </div>
+        <div>
+          <div class="news-small-title">${n.title}</div>
+          <div class="news-small-meta">${n.meta}</div>
+        </div>
+      </div>`).join('')}
+    </div>
+    <div class="news-sidebar">
+      <div class="more-news-title">More News</div>
+      <div class="news-tags">
+        <span class="news-tag">Top news</span>
+        <span class="news-tag">Celebrity news</span>
+        <span class="news-tag">Movie news</span>
+        <span class="news-tag">Indie news</span>
+        <span class="news-tag">TV news</span>
+      </div>
+    </div>`;
+}
+
+function renderRV(){
+  document.getElementById('rvTrack').innerHTML=rvData.map(r=>`
+    <div class="rv-card">
+      <div class="rv-poster">
+        <div class="rv-add">+</div>
+        ${i(r.img,r.fb,r.title,'','width:100%;height:100%;object-fit:cover;display:block;')}
+      </div>
+      <div class="rv-title">${r.title}</div>
+    </div>`).join('');
+}
+
+// ─── HERO SLIDES ─────────────────────────────────────────
+const heroSlides = [
+  {bg:"linear-gradient(160deg,#1a1208 0%,#2a1a08 40%,#0a0808 100%)",emoji:"⚓",posterEmoji:"⚓",posterTitle:"THE ODYSSEY",posterDate:"07.17.26",title:"'The Odyssey'",dur:"2:32",sub:"Watch the Trailer",likes:"1.5K",hearts:"787"},
+  {bg:"linear-gradient(160deg,#0a1020 0%,#0a0818 50%,#000 100%)",emoji:"🦸",posterEmoji:"🦸",posterTitle:"THE BOYS",posterDate:"2026",title:"'The Boys' — Final Season",dur:"5:19",sub:"Watch the Exclusive Clip",likes:"1.2K",hearts:"654"},
+  {bg:"linear-gradient(160deg,#100808 0%,#200810 50%,#080008 100%)",emoji:"😈",posterEmoji:"😈",posterTitle:"OBSESSION",posterDate:"2026",title:"'Obsession'",dur:"3:45",sub:"Watch the Trailer",likes:"892",hearts:"421"},
+  {bg:"linear-gradient(160deg,#081020 0%,#081828 50%,#000810 100%)",emoji:"🏰",posterEmoji:"🏰",posterTitle:"DUTTON RANCH",posterDate:"2026",title:"'Dutton Ranch'",dur:"2:18",sub:"Watch the Teaser",likes:"2.1K",hearts:"1.1K"},
+];
+let heroIdx = 0;
+
+function updateHero(idx, dir=1) {
+  const s = heroSlides[idx];
+  const imgEl = document.getElementById('heroImg');
+  const posterEmoji = document.getElementById('heroPosterEmoji');
+
+  // fade out
+  imgEl.style.transition = 'opacity 0.3s';
+  imgEl.style.opacity = '0';
+
+  setTimeout(()=>{
+    imgEl.style.background = s.bg;
+    imgEl.textContent = s.emoji;
+    imgEl.style.opacity = '1';
+  }, 300);
+
+  posterEmoji.textContent = s.posterEmoji;
+  document.querySelector('.hero-poster-title-txt').textContent = s.posterTitle;
+  document.querySelector('.hero-poster-date').textContent = s.posterDate;
+  document.getElementById('heroTitle').textContent = s.title;
+  document.getElementById('heroDur').textContent = s.dur;
+  document.getElementById('heroSub').textContent = s.sub;
+  document.getElementById('heroLikes').textContent = s.likes;
+  document.getElementById('heroHearts').textContent = s.hearts;
+}
+
+document.getElementById('heroPrev').addEventListener('click', ()=>{
+  heroIdx = (heroIdx - 1 + heroSlides.length) % heroSlides.length;
+  updateHero(heroIdx, -1);
+});
+document.getElementById('heroNext').addEventListener('click', ()=>{
+  heroIdx = (heroIdx + 1) % heroSlides.length;
+  updateHero(heroIdx, 1);
+});
+
+// ─── INTERACTIONS ────────────────────────────────────────
+function scrollC(id, dir) {
+  const el = document.getElementById(id);
+  if(el) el.scrollBy({left: dir*520, behavior:'smooth'});
+}
+
+function switchCeleb(el, key) {
+  document.querySelectorAll('.celeb-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function switchStream(btn) {
+  document.querySelectorAll('.stab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  const labels = {
+    'Prime Video':'Included with Prime',
+    'Apple TV':'Included with Apple TV+',
+    'JioCinema':'Included with JioSaavn',
+    'SonyLIV':'Included with SonyLIV Premium',
+    'Netflix':'Included with Netflix Standard',
+    'ZEE5':'Included with ZEE5',
+    'SunNXT':'Included with SunNXT'
+  };
+  document.getElementById('streamLabel').textContent = labels[btn.textContent] || 'Included';
+}
+
+// Menu toggle
+const menuBtn = document.getElementById('menuBtn');
+const megaMenu = document.getElementById('megaMenu');
+menuBtn.addEventListener('click', e=>{e.stopPropagation(); megaMenu.classList.toggle('open');});
+document.addEventListener('click', ()=>megaMenu.classList.remove('open'));
+megaMenu.addEventListener('click', e=>e.stopPropagation());
+
+// Sign in popup
+const signinBtn = document.getElementById('signinBtn');
+const signinPopup = document.getElementById('signinPopup');
+const popupClose = document.getElementById('popupClose');
+signinBtn.addEventListener('click', e=>{e.stopPropagation(); signinPopup.classList.toggle('open');});
+popupClose.addEventListener('click', ()=>signinPopup.classList.remove('open'));
+document.addEventListener('click', ()=>signinPopup.classList.remove('open'));
+signinPopup.addEventListener('click', e=>e.stopPropagation());
+
+// Back to top
+const backTop = document.getElementById('backTop');
+window.addEventListener('scroll', ()=>{
+  backTop.classList.toggle('show', window.scrollY > 400);
+});
+backTop.addEventListener('click', ()=>window.scrollTo({top:0,behavior:'smooth'}));
+
+// Watchlist button feedback
+document.addEventListener('click', e=>{
+  const add = e.target.closest('.mcard-add, .rv-add, .cs-add-top, .bo-add, .top10-big-add, .hero-add');
+  if(add) {
+    const orig = add.textContent;
+    add.textContent = '✓';
+    add.style.background = 'var(--gold)';
+    add.style.color = '#000';
+    setTimeout(()=>{add.textContent=orig;add.style.background='';add.style.color='';},1500);
+  }
+});
+
+// ─── INIT ─────────────────────────────────────────────────
+renderUpnext();
+renderFeatured();
+renderCelebs();
+renderCarousel('topPicksTrack', topPicksData, 'movie');
+renderCarousel('fanTrack', fanData, 'movie');
+renderCarousel('theatersTrack', theatersData, 'showtimes');
+renderCarousel('streamTrack', streamData, 'movie');
+renderTop10();
+renderBoxOffice();
+renderInterests();
+renderComingSoon();
+renderBorn();
+renderNews();
+renderRV();
+// HERO SLIDER MOVIES
+const heroMovies = [
+{
+  title: "Salaar: Part 1 – Ceasefire",
+  duration: "2:32",
+  subtitle: "Watch the Trailer",
+  likes: "1.5K",
+  hearts: "787",
+  backdrop: "https://images.assettype.com/nationalherald/2023-12/bc51c2b2-5980-46cd-84e9-dcb71677910f/salaar.jpeg",
+  poster: "https://upload.wikimedia.org/wikipedia/en/a/a6/Salaar_Part_1_%E2%80%93_Ceasefire.jpg"
+},
+
+{
+  title: "Pushpa 2: The Rule",
+  duration: "2:48",
+  subtitle: "Official Trailer",
+  likes: "2.3K",
+  hearts: "1.2K",
+  backdrop: "https://images.indianexpress.com/2024/12/Pushpa-2-2_5c85c6.jpg",
+  poster: "https://upload.wikimedia.org/wikipedia/en/1/11/Pushpa_2-_The_Rule.jpg"
+},
+
+{
+  title: "Devara",
+  duration: "2:10",
+  subtitle: "Watch the Teaser",
+  likes: "1.8K",
+  hearts: "910",
+  backdrop: "https://pbs.twimg.com/media/GDUuEfJakAAgwos.jpg",
+  poster: "https://m.media-amazon.com/images/M/MV5BYmI5NTljYWItMDhjMC00NDQwLWFhMjQtNWNjNDYzYzkwNGQ0XkEyXkFqcGc@._V1_QL75_UY281_CR18,0,190,281_.jpg"
+}
+];
+
+let currentHero = 0;
+
+// LOAD HERO
+function loadHero(index){
+
+  const movie = heroMovies[index];
+
+  document.getElementById("heroBackdrop").src =
+    movie.backdrop;
+
+  document.getElementById("heroPoster").src =
+    movie.poster;
+
+  document.getElementById("heroTitle").textContent =
+    movie.title;
+
+  document.getElementById("heroDur").textContent =
+    movie.duration;
+
+  document.getElementById("heroSub").textContent =
+    movie.subtitle;
+
+  document.getElementById("heroLikes").textContent =
+    movie.likes;
+
+  document.getElementById("heroHearts").textContent =
+    movie.hearts;
+}
+
+// NEXT BUTTON
+document.getElementById("heroNext")
+.addEventListener("click", () => {
+
+  currentHero =
+    (currentHero + 1) % heroMovies.length;
+
+  loadHero(currentHero);
+});
+
+// PREVIOUS BUTTON
+document.getElementById("heroPrev")
+.addEventListener("click", () => {
+
+  currentHero =
+    (currentHero - 1 + heroMovies.length)
+    % heroMovies.length;
+
+  loadHero(currentHero);
+});
+
+// AUTO SCROLL
+setInterval(() => {
+
+  currentHero =
+    (currentHero + 1) % heroMovies.length;
+
+  loadHero(currentHero);
+
+}, 4000);
+
+// INITIAL LOAD
+loadHero(0);
+</script>
+</body>
+</html>
